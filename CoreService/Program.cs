@@ -1,30 +1,19 @@
+using CoreService.Services;
 using Discord.Interactions;
 using Discord.WebSocket;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 
-namespace CoreService
-{
-    public class Program
+using IHost host = Host.CreateDefaultBuilder(args)
+    .ConfigureAppConfiguration(config =>
     {
-        public async static void Main(string[] args)
-        {
-            using IHost host = Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration(config =>
-                {
-                    config.AddYamlFile("_config.yml", false);       // Add the config file to IConfiguration variables
-                })
-                .ConfigureServices(services =>
-                {
-                    services.AddSingleton<DiscordSocketClient>();       // Add the discord client to services
-                    services.AddSingleton<InteractionService>();        // Add the interaction service to services
-                    services.AddHostedService<InteractionHandlingService>();    // Add the slash command handler
-                    services.AddHostedService<DiscordStartupService>();         // Add the discord startup service
-                })
-                .Build();
+        config.AddJsonFile("config.json", false);       // Add the config file to IConfiguration variables
+    })
+    .ConfigureServices(services =>
+    {
+        services.AddSingleton<DiscordSocketClient>();               // Add the discord client to services
+        services.AddSingleton<InteractionService>();                // Add the interaction service to services
+        services.AddHostedService<InteractionHandlingService>();    // Add the slash command handler
+        services.AddHostedService<DiscordStartupService>();         // Add the discord startup service
+    })
+    .Build();
 
-            await host.RunAsync();
-        }
-    }
-}
+await host.RunAsync();
