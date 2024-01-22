@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "CoreService": {
+    "Core": {
       "commandName": "Project",
       "environmentVariables": {
         "DOTNET_ENVIRONMENT": "Development"

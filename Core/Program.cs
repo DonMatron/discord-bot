@@ -1,4 +1,4 @@
-using CoreService.Services;
+using Core.Services;
 using Discord.Interactions;
 using Discord.WebSocket;
 

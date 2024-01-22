@@ -1,10 +1,10 @@
-﻿using CoreService.Utility;
+﻿using Core.Utility;
 using Discord;
 using Discord.Interactions;
 using Discord.WebSocket;
 using System.Reflection;
 
-namespace CoreService.Services
+namespace Core.Services
 {
     public class InteractionHandlingService : IHostedService
     {

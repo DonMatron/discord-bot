@@ -1,8 +1,8 @@
-﻿using CoreService.Utility;
+﻿using Core.Utility;
 using Discord;
 using Discord.WebSocket;
 
-namespace CoreService.Services
+namespace Core.Services
 {
     public class DiscordStartupService : IHostedService
     {
