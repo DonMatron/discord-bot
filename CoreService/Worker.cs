@@ -6,18 +6,19 @@ namespace CoreService
 {
     public class Worker : BackgroundService
     {
-
+        private readonly ILogger<Worker> _logger;
+        private readonly DiscordSocketConfig _config;
         private readonly DiscordSocketClient _client;
-
-        private readonly CommandService _commandService;
-
         private readonly LoggingService _loggingService;
+        private readonly CommandHandler _commandHandler;
 
-        public Worker(ILogger<Worker> logger)
+        public Worker(ILogger<Worker> logger, CommandService commandService)
         {
-            _client = new DiscordSocketClient();
-            _commandService = new CommandService();
-            _loggingService = new LoggingService(_client, _commandService, logger);
+            _logger = logger;
+            _config = new DiscordSocketConfig { MessageCacheSize = 100 };
+            _client = new DiscordSocketClient(_config);
+            _loggingService = new LoggingService(_client, commandService, _logger);
+            _commandHandler = new CommandHandler(_client, commandService);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -25,20 +26,29 @@ namespace CoreService
             //TODO: move token to safer place
             var token = "MTE5ODc1NzI2ODQ4MTYzODU1MQ.GCNjdu.vZlEfS0GKw5-yESdMLV-RxbEf04I3FGVnwvKiE";
 
-            //Some alternative options would be to keep your token in an Environment Variable or a standalone file.
-            //var token = Environment.GetEnvironmentVariable("NameOfYourEnvironmentVariable");
-            //var token = File.ReadAllText("token.txt");
-            //var token = JsonConvert.DeserializeObject<AConfigurationClass>(File.ReadAllText("config.json")).Token;
-
             await _client.LoginAsync(TokenType.Bot, token);
             await _client.StartAsync();
 
-            while (!stoppingToken.IsCancellationRequested)
+            _client.MessageUpdated += MessageUpdated;
+            _client.Ready += () =>
             {
-                // Block this task until the program is closed.
-                await Task.Delay(-1);
-            }
+                _logger.LogInformation("Bot is connected!");
+                return Task.CompletedTask;
+            };
 
+            BlockProcess(stoppingToken);
+        }
+
+        private async Task MessageUpdated(Cacheable<IMessage, ulong> before, SocketMessage after, ISocketMessageChannel channel)
+        {
+            // If the message was not in the cache, downloading it will result in getting a copy of `after`.
+            var message = await before.GetOrDownloadAsync();
+            _logger.LogInformation($"{message} -> {after}");
+        }
+
+        private async void BlockProcess(CancellationToken stoppingToken)
+        {
+            await Task.Delay(-1, stoppingToken);
         }
     }
 }

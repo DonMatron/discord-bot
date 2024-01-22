@@ -20,9 +20,9 @@ namespace CoreService
         {
             if (message.Exception is CommandException cmdException)
             {
-                _logger.LogInformation($"[Command/{message.Severity}] {cmdException.Command.Aliases.First()}"
+                _logger.LogError($"[Command/{message.Severity}] {cmdException.Command.Aliases.First()}"
                     + $" failed to execute in {cmdException.Context.Channel}.");
-                _logger.LogInformation(cmdException.ToString());
+                _logger.LogError(cmdException.ToString());
             }
             else
                 _logger.LogInformation($"[General/{message.Severity}] {message}");
