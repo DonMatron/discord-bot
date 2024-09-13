@@ -3,6 +3,7 @@ using Discord.Interactions;
 
 namespace Core.Modules
 {
+    [Group("admin", "Commands for administrators")]
     public class InfoModule : InteractionModuleBase<SocketInteractionContext>
     {
         [SlashCommand("say", "Make the bot say something.")]
